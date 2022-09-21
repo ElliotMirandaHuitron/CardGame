@@ -2,9 +2,11 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { Card } from "./Card";
 
+
+
 export const Cards = ({ hand, isStarted, isWinner }) => {
   //console.log(hand.id);
-  console.log(hand);
+  //console.log(hand);
   const isFiveHand = hand.length; 
   return (
     <>

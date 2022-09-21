@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 
-export const DealButton = ({onGetHand,isStarted,isWinner}) => {
+const DealButton = React.memo(({onGetHand,isStarted,isWinner}) => {
 
 
   return (
@@ -16,7 +16,9 @@ export const DealButton = ({onGetHand,isStarted,isWinner}) => {
     }
     </div>
   )
-};
+});
+
+DealButton.displayName="DealButton"
 
 DealButton.propTypes = {
   onGetHand: PropTypes.func ,
@@ -26,3 +28,5 @@ DealButton.propTypes = {
 DealButton.defaultProps = {
   
 };
+
+export { DealButton }

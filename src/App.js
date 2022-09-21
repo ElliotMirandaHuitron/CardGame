@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Confetti from "react-dom-confetti";
 import { generateId } from "./helpers/generateId";
+import Confetti from "react-dom-confetti";
 import { CardsCounter } from "./components/CardsCounter";
 import { Cards } from "./components/Cards";
 import { DealButton } from "./components/DealButton";
 import { ResetButton } from "./components/ResetButton";
 import { deck as rawDeck } from "./helpers/deck";
+import { useShuffle } from "./hooks/useShuffle";
 
 const confettiParams = {
   angle: 90,
@@ -33,7 +34,10 @@ export const App = () => {
   const [isWinner, setIsWinner] = useState("");
 
 
-  //Shuffle Deck
+  //const [shuffledDeck, setShuffledDeck] = useShuffle(deck)
+
+
+  //Shuffle Deck (No Custom Hook)
   function onShuffle(deck) {
     //copy
     const shuffDeck = [...deck];
@@ -57,51 +61,63 @@ export const App = () => {
     setDeck(shuffDeck);
   }
 
+
+
   
+  // Unoptimized version
+  // const handHandler = useCallback(() => {
+  //   setHand(deck.slice(-5).map((deck) => ({...deck,id:generateId()}) ));
+  //   setDeck(deck.slice(0, deck.length - 5));
+  //   setIsStarted(true); //game Started
+  // }, [deck]);
+
+
   const handHandler = useCallback(() => {
     setHand(deck.slice(-5).map((deck) => ({...deck,id:generateId()}) ));
-    setDeck(deck.slice(0, deck.length - 5));
+    setDeck( previousDeck => {
+      return previousDeck.slice(0, previousDeck.length - 5);
+    });
     setIsStarted(true); //game Started
-  }, [deck]);
+  }, []);
+
 
   const resetDeckHandler = useCallback(() =>{
     setIsStarted(false);//Yet to start game again
     setIsWinner('');//no winner or loser
     onShuffle(rawDeck);//shuffle deck
+    //setShuffledDeck();// Shuffle Deck Custom Hook
   }, []);
 
   const loseHandler = useCallback(() => {
     setIsWinner(false);
   }, []);
 
-  
   const winHandler = useCallback(() => {
     setIsWinner(true);
   }, []);
   
-
   useEffect(() => {
     onShuffle(rawDeck);
+    //setShuffledDeck();// Shuffle Deck Custom Hook
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   //lg(1024px) is only breakpoint
   return (
     <div className="bg-gradient-to-b from-green-700 to-green-900 h-[896px] w-[414px] mx-auto lg:w-full lg:min-h-screen">
-      <CardsCounter deck={deck} onLosing={ loseHandler } onWinning={ winHandler } />
-      <Cards hand={hand} isStarted={isStarted} isWinner={isWinner} />
+      <CardsCounter deck={ deck } onLosing={ loseHandler } onWinning={ winHandler } />
+      <Cards hand={ hand } isStarted={ isStarted } isWinner={ isWinner } />
       <DealButton
         onGetHand={ handHandler }
-        isStarted={isStarted}
-        isWinner={isWinner}
+        isStarted={ isStarted }
+        isWinner={ isWinner }
       />
       <ResetButton
         deck={ rawDeck }
         onResetDeck={ resetDeckHandler }
         isStarted={ isStarted }
         isWinner={ isWinner }
-      />
-
+      /> 
       <Confetti active={isWinner} config={confettiParams} />
     </div>
   );

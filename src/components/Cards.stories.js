@@ -2,7 +2,7 @@ import React from 'react';
 import { Cards } from './Cards';
 
 export default {
-  title: 'CardsGame/WinLose',
+  title: 'CardsGame/WinOrLose',
   component: Cards,
   parameters: {
     backgrounds: {
