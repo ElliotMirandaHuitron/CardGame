@@ -24,7 +24,8 @@ const confettiParams = {
 
 export const App = () => {
   //Deck Inicial
-  const [deck, setDeck] = useState(rawDeck);
+  const [deck,setShuffledDeck] = useShuffle(rawDeck);//Custom Hook
+  //const [deck, setDeck] = useState(rawDeck);//WO Custom Hook
   //Hand
   const [hand, setHand] = useState([]);
   //Game Started
@@ -34,59 +35,22 @@ export const App = () => {
   const [isWinner, setIsWinner] = useState("");
 
 
-  //const [shuffledDeck, setShuffledDeck] = useShuffle(deck)
-
-
-  //Shuffle Deck (No Custom Hook)
-  function onShuffle(deck) {
-    //copy
-    const shuffDeck = [...deck];
-
-    //Shuffle Deck
-    let cardsLeft = shuffDeck.length,
-      originalIndex,
-      randomIndex,
-      random;
-    for (let i = 1; i <= shuffDeck.length; i++) {
-      //Random Index
-      random = Math.random() * cardsLeft--;
-      randomIndex = Math.floor(random);
-
-      //Building Random Cards
-      originalIndex = shuffDeck[cardsLeft]; //Hold last index value in t
-      shuffDeck[cardsLeft] = shuffDeck[randomIndex]; //Cambio el valor del ultimo indice del deck por el valor del indice random
-      shuffDeck[randomIndex] = originalIndex; //cambio valor del indice random por el Holdeado
-      //console.log('Random Card: ',remDeck[cardsLeft]);//Each random card
-    }
-    setDeck(shuffDeck);
-  }
-
-
-
-  
-  // Unoptimized version
-  // const handHandler = useCallback(() => {
-  //   setHand(deck.slice(-5).map((deck) => ({...deck,id:generateId()}) ));
-  //   setDeck(deck.slice(0, deck.length - 5));
-  //   setIsStarted(true); //game Started
-  // }, [deck]);
-
-
+  // Optimized version
   const handHandler = useCallback(() => {
     setHand(deck.slice(-5).map((deck) => ({...deck,id:generateId()}) ));
-    setDeck( previousDeck => {
+    setShuffledDeck( previousDeck => {
       return previousDeck.slice(0, previousDeck.length - 5);
     });
     setIsStarted(true); //game Started
-  }, []);
+  }, [deck, setShuffledDeck]);
 
 
   const resetDeckHandler = useCallback(() =>{
     setIsStarted(false);//Yet to start game again
     setIsWinner('');//no winner or loser
-    onShuffle(rawDeck);//shuffle deck
-    //setShuffledDeck();// Shuffle Deck Custom Hook
-  }, []);
+    //onShuffle(rawDeck);//shuffle deck
+    setShuffledDeck(rawDeck);// Shuffle Deck Custom Hook
+  }, [setShuffledDeck]);
 
   const loseHandler = useCallback(() => {
     setIsWinner(false);
@@ -97,8 +61,8 @@ export const App = () => {
   }, []);
   
   useEffect(() => {
-    onShuffle(rawDeck);
-    //setShuffledDeck();// Shuffle Deck Custom Hook
+    //onShuffle(rawDeck);
+    setShuffledDeck(rawDeck);// Shuffle Deck Custom Hook
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
